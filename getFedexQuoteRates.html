@@ -1,0 +1,137 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <lightning-card>
+<div class="slds-p-left_xx-large">
+        <div if:true={rates}>
+            Account Number {rates.accountNumber.value}
+        </div>
+        <br/> <br/>
+        Please Enter Shipping Address :   <br/> <br/>
+        <div if:true={shippingaddress}>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-6">
+                    <lightning-input label="State Code" value={shippingaddress.stateOrProvinceCode}
+                        onchange={shippingAddressHandler}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-6">
+                    <lightning-input label="Postal Code" value={shippingaddress.postalCode}
+                        onchange={shippingAddressHandler}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-6">
+                    <lightning-input label="Country Code" value={shippingaddress.countryCode}
+                        onchange={shippingAddressHandler}>
+                    </lightning-input>
+                </div>
+            </div>
+        </div>
+        <br/> <br/>
+        Please Enter Recepient Address :   <br/> <br/>
+        <div if:true={recepientaddress}>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-6">
+                    <lightning-input label="State Code" value={recepientaddress.stateOrProvinceCode}
+                        onchange={recepientAddressHandler}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-6">
+                    <lightning-input label="Postal Code" value={recepientaddress.postalCode}
+                        onchange={recepientAddressHandler}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-6">
+                    <lightning-input label="Country Code" value={recepientaddress.countryCode}
+                        onchange={recepientAddressHandler}>
+                    </lightning-input>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <lightning-combobox
+        name="Pickup Type"
+        label="Pickup Type"
+        value={value}
+        placeholder="Select Pickup Type"
+        options={options} class="slds-col slds-size_1-of-3"
+        onchange={handleChange} ></lightning-combobox>
+        <br/>
+        Add Package Weights :
+        <br/> <br/>
+        <table class="simple-table">
+            <thead class="simple-table__head">
+                <tr class="slds-line-height_reset">
+                    <th>
+                        <span class="slds-col slds-size_1-of-3 slds-text-title_caps">Package Value</span>
+                    </th>
+                    <th>
+                        <span class="slds-col slds-size_1-of-3 slds-text-title_caps">Package Units</span>
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <template if:true={requestedPackageLineItems.length}>
+                    <template for:each={requestedPackageLineItems} for:item="lineItem" for:index="index">
+                        <tr key={lineItem.Id}>
+                            <td class="slds-col slds-size_1-of-3 slds-p-right_xx-large"><lightning-input data-index={index} data-name="value" value={lineItem.weight.value}
+                                onchange={onPackageLineItemChange}>
+                            </lightning-input>
+                        </td>
+                            <td class="slds-col slds-size_1-of-3"> <lightning-input data-index={index} data-name="units" value={lineItem.weight.units}
+                                onchange={onPackageLineItemChange}>
+                            </lightning-input>
+                        </td>
+                            <td class="slds-p-left_x-large">
+                                <div>
+                                    <lightning-button-icon icon-name="utility:add" size="medium" variant="bare"
+                                        alternative-text="Add" onclick={handleCreate} data-index={index}>
+                                    </lightning-button-icon>
+                                    <template if:true={showDeletebtn}>
+                                    <lightning-button-icon icon-name="utility:delete" class="slds-p-left_medium"
+                                        size="medium" variant="bare" alternative-text="Delete" onclick={handleDelete}
+                                        data-index={index}>
+                                    </lightning-button-icon>
+                                    </template>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </template>
+            </tbody>
+        </table>
+        <br/>
+        <lightning-button variant="brand" class="slds-p-top_xx-large" label="Get Rates" onclick={getFedexAPIRates}></lightning-button>
+        <br/><br/>
+        <template if:true={ratesResponse.length}>
+            Following are the rates available with different mailing services
+            <br/><br/>
+            <template for:each={ratesResponse} for:item="rateResponse" for:index="index">
+                <div key={rateResponse.serviceName}>
+                Package Type : {rateResponse.packagingType} <br/>
+                Service Name : {rateResponse.serviceName} <br/>
+                Service Type : {rateResponse.serviceType} <br/>
+                Signature Option Type : {rateResponse.signatureOptionType} <br/>
+                    <template for:each={rateResponse.ratedShipmentDetails} for:item="shipmentDetail" for:index="index">
+                    <div key={shipmentDetail.rateType}>
+                        Rate Type : {shipmentDetail.rateType} <br/>
+                        Total Base Charge  : {shipmentDetail.totalBaseCharge} <br/>
+                        Total Discounts  : {shipmentDetail.totalDiscounts} <br/>
+                        Total NetCharge  : {shipmentDetail.totalNetCharge} <br/>
+                        Total Net FedExCharge  : {shipmentDetail.totalNetFedExCharge} <br/><br/>
+                        </div>
+                    </template>
+                </div>
+                </template>
+                </template>
+
+    </div>
+      <!-- Show Processing Spinner Icon -->
+      <template if:true={isProcessing}>
+        <div>
+            <lightning-spinner size="medium"></lightning-spinner>
+        </div>
+    </template>
+    </lightning-card>
+    
+</template>
